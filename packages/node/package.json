@@ -1,0 +1,36 @@
+{
+  "name": "@buujs/sati-node",
+  "version": "0.1.0",
+  "license": "MIT",
+  "author": "Forte Zhuo",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@hono/node-server": "^2.0.0",
+    "prexit": "catalog:"
+  },
+  "peerDependencies": {
+    "@buujs/sati": "workspace:*"
+  }
+}

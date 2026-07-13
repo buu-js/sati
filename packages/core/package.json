@@ -1,0 +1,58 @@
+{
+  "name": "@buujs/sati",
+  "version": "0.1.0",
+  "license": "MIT",
+  "author": "Forte Zhuo",
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./logger": {
+      "import": {
+        "types": "./dist/logger/index.d.ts",
+        "default": "./dist/logger/index.js"
+      },
+      "require": {
+        "types": "./dist/logger/index.d.cts",
+        "default": "./dist/logger/index.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "dev": "tsdx dev",
+    "build": "tsdx build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "tsdx lint",
+    "format": "tsdx format",
+    "format:check": "tsdx format --check",
+    "typecheck": "tsdx typecheck",
+    "prepublishOnly": "pnpm build"
+  },
+  "dependencies": {
+    "@buujs/sati-utils": "workspace:*",
+    "hono-rate-limiter": "^0.5.3",
+    "pino": "^10.3.1"
+  },
+  "peerDependencies": {
+    "hono": "^4.12.27"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

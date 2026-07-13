@@ -1,0 +1,41 @@
+{
+  "name": "@buujs/sati-mono",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "author": "Forte Zhuo",
+  "repository": "github:buu-js/sati",
+  "type": "module",
+  "scripts": {
+    "dev": "tsdx dev",
+    "build": "tsdx build",
+    "test": "tsdx test",
+    "test:watch": "tsdx test --watch",
+    "lint": "tsdx lint",
+    "format": "tsdx format",
+    "format:check": "tsdx format --check",
+    "typecheck": "tsdx typecheck",
+    "prepublishOnly": "bun run build"
+  },
+  "devDependencies": {
+    "@buujs/sati": "workspace:*",
+    "@buujs/sati-node": "workspace:*",
+    "@buujs/sati-nodemailer": "workspace:*",
+    "@buujs/sati-nodescheduler": "workspace:*",
+    "@types/node": "^22.10.2",
+    "@typescript/typescript6": "^6.0.2",
+    "bunchee": "^6.12.0",
+    "hono": "^4.12.27",
+    "oxfmt": "^0.58.0",
+    "oxlint": "^1.73.0",
+    "oxlint-tsgolint": "^0.24.0",
+    "prexit": "^2.3.0",
+    "tsdx": "^2.0.0",
+    "typescript": "^7.0.2",
+    "undici": "^8.7.0",
+    "vitest": "^4.1.10"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
