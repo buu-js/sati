@@ -28,17 +28,17 @@ export function createLogger(ctx?: Context) {
     debug: (message: string) => logger.debug(`${prefix}${message}`),
     warn: (message: string) => logger.warn(`${prefix}${message}`),
     info: (message: string) => logger.info(`${prefix}${message}`),
-    error: (o: unknown, stack = false) => {
-      const error =
-        o instanceof Error
-          ? (o as Error)
-          : { message: `${o}`, name: "Error", stack: "" }
+    error: (error: unknown, stack = false) => {
+      const _error =
+        error instanceof Error
+          ? error
+          : { message: `${error}`, name: "Error", stack: "" }
       //@ts-expect-error ignore error.status
-      const message = `${prefix}${error.message} [${error?.status || error?.name}]${
+      const message = `${prefix}${_error.message} [${_error?.status || _error?.name}]${
         !stack
           ? ""
           : `
-${error.stack}`
+${_error.stack}`
       }`
 
       logger.error(`${message}`)
