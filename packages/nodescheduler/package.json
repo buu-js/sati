@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "license": "MIT",
   "author": "Forte Zhuo",
+  "repository": "github:buu-js/sati",
+  "files": [
+    "dist"
+  ],
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -19,13 +23,6 @@
       }
     },
     "./package.json": "./package.json"
-  },
-  "files": [
-    "dist",
-    "src"
-  ],
-  "engines": {
-    "node": ">=20"
   },
   "scripts": {
     "dev": "tsdx dev",
@@ -44,5 +41,8 @@
   },
   "peerDependencies": {
     "@buujs/sati": "workspace:*"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }

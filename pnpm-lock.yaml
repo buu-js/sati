@@ -65,9 +65,6 @@ importers:
 
   packages/core:
     dependencies:
-      '@buujs/sati-utils':
-        specifier: workspace:*
-        version: link:../utils
       hono:
         specifier: ^4.12.27
         version: 4.12.29
@@ -77,6 +74,10 @@ importers:
       pino:
         specifier: ^10.3.1
         version: 10.3.1
+    devDependencies:
+      '@buujs/sati-utils':
+        specifier: workspace:*
+        version: link:../utils
 
   packages/node:
     dependencies:
