@@ -32,6 +32,24 @@
         "default": "./dist/logger/index.cjs"
       }
     },
+    "./scheduler": {
+      "import": {
+        "types": "./dist/scheduler/index.d.ts"
+      },
+      "require": {
+        "types": "./dist/scheduler/index.d.cts"
+      }
+    },
+    "./shutdown": {
+      "import": {
+        "types": "./dist/shutdown/index.d.ts",
+        "default": "./dist/shutdown/index.js"
+      },
+      "require": {
+        "types": "./dist/shutdown/index.d.cts",
+        "default": "./dist/shutdown/index.cjs"
+      }
+    },
     "./package.json": "./package.json"
   },
   "scripts": {

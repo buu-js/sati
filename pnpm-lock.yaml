@@ -17,15 +17,15 @@ importers:
       '@buujs/sati':
         specifier: workspace:*
         version: link:packages/core
+      '@buujs/sati-croner':
+        specifier: workspace:*
+        version: link:packages/croner
       '@buujs/sati-node':
         specifier: workspace:*
         version: link:packages/node
       '@buujs/sati-nodemailer':
         specifier: workspace:*
         version: link:packages/nodemailer
-      '@buujs/sati-nodescheduler':
-        specifier: workspace:*
-        version: link:packages/nodescheduler
       '@types/node':
         specifier: ^22.10.2
         version: 22.20.1
@@ -79,6 +79,19 @@ importers:
         specifier: workspace:*
         version: link:../utils
 
+  packages/croner:
+    dependencies:
+      '@buujs/sati':
+        specifier: workspace:*
+        version: link:../core
+      croner:
+        specifier: ^10.0.1
+        version: 10.0.1
+    devDependencies:
+      '@buujs/sati-utils':
+        specifier: workspace:*
+        version: link:../utils
+
   packages/node:
     dependencies:
       '@buujs/sati':
@@ -103,18 +116,6 @@ importers:
       '@types/nodemailer':
         specifier: ^8.0.1
         version: 8.0.1
-
-  packages/nodescheduler:
-    dependencies:
-      '@buujs/sati':
-        specifier: workspace:*
-        version: link:../core
-      node-cron:
-        specifier: ^4.6.0
-        version: 4.6.0
-      prexit:
-        specifier: 'catalog:'
-        version: 2.3.0
 
   packages/utils: {}
 
@@ -1093,6 +1094,10 @@ packages:
   convert-source-map@2.0.0:
     resolution: {integrity: sha512-Kvp459HrV2FEJ1CAsi1Ku+MY3kasH19TFykTz2xWmMeq6bk2NU3XXvfJ+Q61m0xktWwt+1HSYf3JZsTms3aRJg==}
 
+  croner@10.0.1:
+    resolution: {integrity: sha512-ixNtAJndqh173VQ4KodSdJEI6nuioBWI0V1ITNKhZZsO0pEMoDxz539T4FTTbSZ/xIOSuDnzxLVRqBVSvPNE2g==}
+    engines: {node: '>=18.0'}
+
   cross-spawn@7.0.6:
     resolution: {integrity: sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA==}
     engines: {node: '>= 8'}
@@ -1339,10 +1344,6 @@ packages:
 
   nanospinner@1.2.2:
     resolution: {integrity: sha512-Zt/AmG6qRU3e+WnzGGLuMCEAO/dAu45stNbHY223tUxldaDAeE+FxSPsd9Q+j+paejmm0ZbrNVs5Sraqy3dRxA==}
-
-  node-cron@4.6.0:
-    resolution: {integrity: sha512-Si/bzYiKRHOB8/a99T2+SDGN582ONDMSTlJr5oCkT6GtnqPjZ2s10eoQRYkW9ZHwjVxONL+W8Fb+qR0AHMQsdg==}
-    engines: {node: '>=20'}
 
   nodemailer@9.0.3:
     resolution: {integrity: sha512-n+YP+NKwR5zRWa60k3GiQ6Q3B4KXCoAw40dAKeCtYn020iNN74aWK2liXIC3ZEATeGql7we3tE3t8QwhY0eskw==}
@@ -2387,6 +2388,8 @@ snapshots:
 
   convert-source-map@2.0.0: {}
 
+  croner@10.0.1: {}
+
   cross-spawn@7.0.6:
     dependencies:
       path-key: 3.1.1
@@ -2579,8 +2582,6 @@ snapshots:
   nanospinner@1.2.2:
     dependencies:
       picocolors: 1.1.1
-
-  node-cron@4.6.0: {}
 
   nodemailer@9.0.3: {}
 

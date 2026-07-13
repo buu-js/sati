@@ -19,9 +19,9 @@
   },
   "devDependencies": {
     "@buujs/sati": "workspace:*",
+    "@buujs/sati-croner": "workspace:*",
     "@buujs/sati-node": "workspace:*",
     "@buujs/sati-nodemailer": "workspace:*",
-    "@buujs/sati-nodescheduler": "workspace:*",
     "@types/node": "^22.10.2",
     "@typescript/typescript6": "^6.0.2",
     "bunchee": "^6.12.0",

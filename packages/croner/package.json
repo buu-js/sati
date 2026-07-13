@@ -1,5 +1,5 @@
 {
-  "name": "@buujs/sati-nodescheduler",
+  "name": "@buujs/sati-croner",
   "version": "0.1.0",
   "license": "MIT",
   "author": "Forte Zhuo",
@@ -36,8 +36,10 @@
     "prepublishOnly": "bun run build"
   },
   "dependencies": {
-    "node-cron": "^4.6.0",
-    "prexit": "catalog:"
+    "croner": "^10.0.1"
+  },
+  "devDependencies": {
+    "@buujs/sati-utils": "workspace:*"
   },
   "peerDependencies": {
     "@buujs/sati": "workspace:*"
