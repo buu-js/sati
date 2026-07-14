@@ -3,7 +3,7 @@ import { createGracefulShutdown, RuntimeAdapter } from "@buujs/sati/shutdown"
 
 const signals: NodeJS.Signals[] = ["SIGINT", "SIGTERM"]
 
-const nodeRuntime: RuntimeAdapter = {
+export const nodeRuntime: RuntimeAdapter = {
   onShutdown: (handler: (signal: string, error?: Error) => void) => {
     signals.forEach((signal) => {
       process.on(signal, () => {
