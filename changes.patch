@@ -1,0 +1,293 @@
+diff --git a/package.json b/package.json
+index e0d0337..b999963 100644
+--- a/package.json
++++ b/package.json
+@@ -22,14 +22,12 @@
+     "@buujs/sati-croner": "workspace:*",
+     "@buujs/sati-node": "workspace:*",
+     "@buujs/sati-nodemailer": "workspace:*",
+-    "@types/node": "^22.10.2",
+     "@typescript/typescript6": "^6.0.2",
+     "bunchee": "^6.12.0",
+     "hono": "^4.12.27",
+     "oxfmt": "^0.58.0",
+     "oxlint": "^1.73.0",
+     "oxlint-tsgolint": "^0.24.0",
+-    "prexit": "^2.3.0",
+     "tsdx": "^2.0.0",
+     "typescript": "^7.0.2",
+     "undici": "^8.7.0",
+diff --git a/packages/core/bin/pretty-log.js b/packages/core/bin/pretty-log.js
+index 8123e7b..43ba663 100755
+--- a/packages/core/bin/pretty-log.js
++++ b/packages/core/bin/pretty-log.js
+@@ -3,7 +3,7 @@
+ import process from "node:process"
+ import pinoPretty from "pino-pretty"
+ 
+-const customConfig = {
++export const customConfig = {
+   colorize: true,
+   translateTime: "SYS:yyyy-mm-dd HH:MM:ss",
+   ignore: "pid,hostname",
+@@ -11,6 +11,12 @@ const customConfig = {
+   errorLikeObjectKeys: ["err", "error"]
+ }
+ 
+-const stream = pinoPretty(customConfig)
++export function initPipeline(input = process.stdin, output = process.stdout) {
++  const prettyStream = pinoPretty({ ...customConfig, destination: output })
+ 
+-process.stdin.pipe(stream).pipe(process.stdout)
++  input.pipe(prettyStream)
++}
++
++if (process.argv[1] === import.meta.filename) {
++  initPipeline()
++}
+diff --git a/packages/core/src/scheduler.ts b/packages/core/src/scheduler.ts
+index 4db5157..0610fca 100644
+--- a/packages/core/src/scheduler.ts
++++ b/packages/core/src/scheduler.ts
+@@ -1,6 +1,8 @@
+ import { createLogger } from "./logger"
++import { createGracefulShutdown } from "./shutdown"
+ 
+ export type SchedulerConfig = {
++  gracefulShutdown: ReturnType<typeof createGracefulShutdown>
+   logger: ReturnType<typeof createLogger>
+ }
+ 
+diff --git a/packages/core/src/shutdown.ts b/packages/core/src/shutdown.ts
+index c5fc3e4..4ad1437 100644
+--- a/packages/core/src/shutdown.ts
++++ b/packages/core/src/shutdown.ts
+@@ -1,72 +1,37 @@
+-declare global {
+-  const Deno:
+-    | {
+-        addSignalListener(signal: string, handler: () => void): void
+-        exit(code?: number): never
+-      }
+-    | undefined
++export interface RuntimeAdapter {
++  onShutdown: (handler: (signal: string, error?: Error) => void) => void
++  exit: (code: number) => never
+ }
+ 
+-const RuntimeAdapter = {
+-  isNodeOrBun: typeof process !== "undefined" && typeof process.on === "function",
+-  isDeno:
+-    typeof (globalThis as any).Deno !== "undefined" &&
+-    typeof (globalThis as any).Deno.addSignalListener === "function",
++export type GracefulShutdown = (fnCleanUp: () => void | Promise<void>) => void
+ 
+-  onShutdown(handler: (signal: string, error?: Error) => void) {
+-    if (this.isNodeOrBun) {
+-      process.on("SIGINT", () => handler("SIGINT"))
+-      process.on("SIGTERM", () => handler("SIGTERM"))
++export type GracefulShutdownFactory = (runtime: RuntimeAdapter) => GracefulShutdown
+ 
+-      process.on("uncaughtException", (err) => handler("uncaughtException", err))
+-      process.on("unhandledRejection", (reason) => {
+-        const err = reason instanceof Error ? reason : new Error(String(reason))
+-        handler("unhandledRejection", err)
+-      })
+-    } else if (this.isDeno) {
+-      const deno = (globalThis as any).Deno
++export const createGracefulShutdown: GracefulShutdownFactory = (runtime) => {
++  const gracefulShutdown = function (fnCleanUp: () => void | Promise<void>) {
++    let isCleanedUp = false
+ 
+-      deno.addSignalListener("SIGINT", () => handler("SIGINT"))
+-      deno.addSignalListener("SIGTERM", () => handler("SIGTERM"))
++    const runCleanUp = async (signal: string, error?: Error) => {
++      if (isCleanedUp) return
+ 
+-      globalThis.addEventListener("unhandledrejection", (event) => {
+-        handler("unhandledRejection", event.reason)
+-      })
+-    }
+-  },
++      isCleanedUp = true
++      if (error) {
++        console.error(`[Crash] ${signal}:`, error)
++      } else {
++        console.log(`[Shutdown] Received ${signal}`)
++      }
+ 
+-  exit(code: number) {
+-    if (this.isNodeOrBun && process.exit) {
+-      process.exit(code)
+-    } else if (this.isDeno) {
+-      const deno = (globalThis as any).Deno
+-      if (deno?.exit) {
+-        deno.exit(code)
++      try {
++        await fnCleanUp()
++        runtime.exit(error ? 1 : 0)
++      } catch (e) {
++        console.error("[Cleanup Error]", e)
++        runtime.exit(1)
+       }
+     }
+-  }
+-}
+ 
+-export function gracefulShutdown(cleanupFn: () => void | Promise<void>) {
+-  let isCleaningUp = false
+-
+-  RuntimeAdapter.onShutdown(async (signal, error) => {
+-    if (isCleaningUp) return
+-    isCleaningUp = true
+-
+-    if (error) {
+-      console.error(`\n[Process Crash] Triggered by ${signal}:`, error)
+-    } else {
+-      console.log(`\n[Shutdown] Received signal ${signal}. Cleaning up active tasks...`)
+-    }
++    runtime.onShutdown((signal, error) => runCleanUp(signal, error))
++  }
+ 
+-    try {
+-      await cleanupFn()
+-      console.log("[Shutdown] Cleanup completed successfully.")
+-      RuntimeAdapter.exit(error ? 1 : 0)
+-    } catch (err) {
+-      console.error("[Shutdown Error] Failed to execute cleanup function:", err)
+-      RuntimeAdapter.exit(1)
+-    }
+-  })
++  return gracefulShutdown
+ }
+diff --git a/packages/croner/src/index.ts b/packages/croner/src/index.ts
+index 675c3fc..c6faeb1 100644
+--- a/packages/croner/src/index.ts
++++ b/packages/croner/src/index.ts
+@@ -1,9 +1,8 @@
+ import { SchedulerFactory, Scheduler } from "@buujs/sati/scheduler"
+-import { gracefulShutdown } from "@buujs/sati/shutdown"
+ import { Cron } from "croner"
+ import { assert } from "@buujs/sati-utils"
+ 
+-export const createScheduler: SchedulerFactory = ({ logger }) => {
++export const createScheduler: SchedulerFactory = ({ gracefulShutdown, logger }) => {
+   function createTask(): Scheduler {
+     let job: Cron | null = null
+ 
+diff --git a/packages/node/package.json b/packages/node/package.json
+index 8dcaabb..19a8562 100644
+--- a/packages/node/package.json
++++ b/packages/node/package.json
+@@ -25,8 +25,10 @@
+     "./package.json": "./package.json"
+   },
+   "dependencies": {
+-    "@hono/node-server": "^2.0.0",
+-    "prexit": "catalog:"
++    "@hono/node-server": "^2.0.0"
++  },
++  "devDependencies": {
++    "@types/node": "^22.20.1"
+   },
+   "peerDependencies": {
+     "@buujs/sati": "workspace:*"
+diff --git a/packages/node/tsconfig.json b/packages/node/tsconfig.json
+index 7de9e1d..b39d68a 100644
+--- a/packages/node/tsconfig.json
++++ b/packages/node/tsconfig.json
+@@ -2,7 +2,8 @@
+   "extends": ["../../tsconfig.base.json"],
+   "compilerOptions": {
+     "outDir": "./dist",
+-    "rootDir": "./src"
++    "rootDir": "./src",
++    "types": ["node"]
+   },
+   "include": ["src/**/*"]
+ }
+diff --git a/pnpm-lock.yaml b/pnpm-lock.yaml
+index 97df901..25a5efa 100644
+--- a/pnpm-lock.yaml
++++ b/pnpm-lock.yaml
+@@ -4,12 +4,6 @@ settings:
+   autoInstallPeers: true
+   excludeLinksFromLockfile: false
+ 
+-catalogs:
+-  default:
+-    prexit:
+-      specifier: ^2.3.0
+-      version: 2.3.0
+-
+ importers:
+ 
+   .:
+@@ -26,9 +20,6 @@ importers:
+       '@buujs/sati-nodemailer':
+         specifier: workspace:*
+         version: link:packages/nodemailer
+-      '@types/node':
+-        specifier: ^22.10.2
+-        version: 22.20.1
+       '@typescript/typescript6':
+         specifier: ^6.0.2
+         version: 6.0.2
+@@ -47,9 +38,6 @@ importers:
+       oxlint-tsgolint:
+         specifier: ^0.24.0
+         version: 0.24.0
+-      prexit:
+-        specifier: ^2.3.0
+-        version: 2.3.0
+       tsdx:
+         specifier: ^2.0.0
+         version: 2.0.0
+@@ -103,9 +91,10 @@ importers:
+       '@hono/node-server':
+         specifier: ^2.0.0
+         version: 2.0.8(hono@4.12.29)
+-      prexit:
+-        specifier: 'catalog:'
+-        version: 2.3.0
++    devDependencies:
++      '@types/node':
++        specifier: ^22.20.1
++        version: 22.20.1
+ 
+   packages/nodemailer:
+     dependencies:
+@@ -1481,10 +1470,6 @@ packages:
+     resolution: {integrity: sha512-gjVS5hOP+M3wMm5nmNOucbIrqudzs9v/57bWRHQWLYklXqoXKrVfYW2W9+glfGsqtPgpiz5WwyEEB+ksXIx3gQ==}
+     engines: {node: '>=18'}
+ 
+-  prexit@2.3.0:
+-    resolution: {integrity: sha512-mX+LIbtS0anKtl2PykYabxninwloblUQMRO6CubeSmjxb+kKlATuJoH9UeN8NLE4TgIEFWfBXw7V3GkWbBrSmg==}
+-    engines: {node: '>=12'}
+-
+   process-warning@5.0.0:
+     resolution: {integrity: sha512-a39t9ApHNx2L4+HBnQKqxxHNs1r7KF+Intd8Q/g1bUh6q0WIp9voPXJ/x0j+ZL45KF1pJd9+q2jLIRMfvEshkA==}
+ 
+@@ -2798,8 +2783,6 @@ snapshots:
+     dependencies:
+       parse-ms: 4.0.0
+ 
+-  prexit@2.3.0: {}
+-
+   process-warning@5.0.0: {}
+ 
+   pump@3.0.4:
+diff --git a/pnpm-workspace.yaml b/pnpm-workspace.yaml
+index a53c716..6356a9e 100644
+--- a/pnpm-workspace.yaml
++++ b/pnpm-workspace.yaml
+@@ -2,7 +2,4 @@ packages:
+   - packages/*
+ 
+ allowBuilds:
+-  '@swc/core': true
+-
+-catalog:
+-  "prexit": "^2.3.0"
++  '@swc/core': true
+\ No newline at end of file

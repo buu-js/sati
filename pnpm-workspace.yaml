@@ -3,6 +3,3 @@ packages:
 
 allowBuilds:
   '@swc/core': true
-
-catalog:
-  "prexit": "^2.3.0"

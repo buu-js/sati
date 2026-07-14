@@ -1,0 +1,26 @@
+import process from "node:process"
+import { createGracefulShutdown, RuntimeAdapter } from "@buujs/sati/shutdown"
+
+const signals: NodeJS.Signals[] = ["SIGINT", "SIGTERM"]
+
+const nodeRuntime: RuntimeAdapter = {
+  onShutdown: (handler: (signal: string, error?: Error) => void) => {
+    signals.forEach((signal) => {
+      process.on(signal, () => {
+        handler(signal, undefined as any)
+      })
+    })
+
+    process.on("uncaughtException", (error) => {
+      handler("uncaughtException", error)
+    })
+
+    process.on("unhandledRejection", (reason) => {
+      const error = reason instanceof Error ? reason : new Error(String(reason))
+      handler("unhandledRejection", error)
+    })
+  },
+  exit: (code) => process.exit(code)
+}
+
+export const gracefulShutdown = createGracefulShutdown(nodeRuntime)

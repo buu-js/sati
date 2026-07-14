@@ -1,9 +1,8 @@
 import { SchedulerFactory, Scheduler } from "@buujs/sati/scheduler"
-import { gracefulShutdown } from "@buujs/sati/shutdown"
 import { Cron } from "croner"
 import { assert } from "@buujs/sati-utils"
 
-export const createScheduler: SchedulerFactory = ({ logger }) => {
+export const createScheduler: SchedulerFactory = ({ gracefulShutdown, logger }) => {
   function createTask(): Scheduler {
     let job: Cron | null = null
 

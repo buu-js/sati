@@ -4,12 +4,6 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-catalogs:
-  default:
-    prexit:
-      specifier: ^2.3.0
-      version: 2.3.0
-
 importers:
 
   .:
@@ -26,9 +20,6 @@ importers:
       '@buujs/sati-nodemailer':
         specifier: workspace:*
         version: link:packages/nodemailer
-      '@types/node':
-        specifier: ^22.10.2
-        version: 22.20.1
       '@typescript/typescript6':
         specifier: ^6.0.2
         version: 6.0.2
@@ -47,9 +38,6 @@ importers:
       oxlint-tsgolint:
         specifier: ^0.24.0
         version: 0.24.0
-      prexit:
-        specifier: ^2.3.0
-        version: 2.3.0
       tsdx:
         specifier: ^2.0.0
         version: 2.0.0
@@ -103,9 +91,10 @@ importers:
       '@hono/node-server':
         specifier: ^2.0.0
         version: 2.0.8(hono@4.12.29)
-      prexit:
-        specifier: 'catalog:'
-        version: 2.3.0
+    devDependencies:
+      '@types/node':
+        specifier: ^22.20.1
+        version: 22.20.1
 
   packages/nodemailer:
     dependencies:
@@ -1481,10 +1470,6 @@ packages:
     resolution: {integrity: sha512-gjVS5hOP+M3wMm5nmNOucbIrqudzs9v/57bWRHQWLYklXqoXKrVfYW2W9+glfGsqtPgpiz5WwyEEB+ksXIx3gQ==}
     engines: {node: '>=18'}
 
-  prexit@2.3.0:
-    resolution: {integrity: sha512-mX+LIbtS0anKtl2PykYabxninwloblUQMRO6CubeSmjxb+kKlATuJoH9UeN8NLE4TgIEFWfBXw7V3GkWbBrSmg==}
-    engines: {node: '>=12'}
-
   process-warning@5.0.0:
     resolution: {integrity: sha512-a39t9ApHNx2L4+HBnQKqxxHNs1r7KF+Intd8Q/g1bUh6q0WIp9voPXJ/x0j+ZL45KF1pJd9+q2jLIRMfvEshkA==}
 
@@ -2797,8 +2782,6 @@ snapshots:
   pretty-ms@9.3.0:
     dependencies:
       parse-ms: 4.0.0
-
-  prexit@2.3.0: {}
 
   process-warning@5.0.0: {}
 

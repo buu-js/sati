@@ -3,7 +3,7 @@
 import process from "node:process"
 import pinoPretty from "pino-pretty"
 
-const customConfig = {
+export const customConfig = {
   colorize: true,
   translateTime: "SYS:yyyy-mm-dd HH:MM:ss",
   ignore: "pid,hostname",
@@ -11,6 +11,12 @@ const customConfig = {
   errorLikeObjectKeys: ["err", "error"]
 }
 
-const stream = pinoPretty(customConfig)
+export function initPipeline(input = process.stdin, output = process.stdout) {
+  const prettyStream = pinoPretty({ ...customConfig, destination: output })
 
-process.stdin.pipe(stream).pipe(process.stdout)
+  input.pipe(prettyStream)
+}
+
+if (process.argv[1] === import.meta.filename) {
+  initPipeline()
+}

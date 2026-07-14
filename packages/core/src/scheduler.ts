@@ -1,6 +1,8 @@
 import { createLogger } from "./logger"
+import { createGracefulShutdown } from "./shutdown"
 
 export type SchedulerConfig = {
+  gracefulShutdown: ReturnType<typeof createGracefulShutdown>
   logger: ReturnType<typeof createLogger>
 }
 
