@@ -1,4 +1,4 @@
-import { SchedulerFactory, Scheduler } from "@buujs/sati/scheduler"
+import { SchedulerFactory, Scheduler, ScheduleConfig } from "@buujs/sati/scheduler"
 import { Cron } from "croner"
 import { assert } from "@buujs/sati-utils"
 
@@ -15,7 +15,7 @@ export const createScheduler: SchedulerFactory = ({ gracefulShutdown, logger }) 
     })
 
     return {
-      register({ name, cronTime }, fn) {
+      register({ name, cronTime }: ScheduleConfig, fn: () => void | Promise<void>) {
         assert(!!cronTime, "Missing Cron Time configuration")
 
         if (job) {

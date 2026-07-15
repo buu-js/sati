@@ -33,7 +33,7 @@
     "format": "tsdx format",
     "format:check": "tsdx format --check",
     "typecheck": "tsdx typecheck",
-    "prepublishOnly": "bun run build"
+    "prepublishOnly": "pnpm run build"
   },
   "dependencies": {
     "croner": "^10.0.1"

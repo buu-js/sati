@@ -88,6 +88,9 @@ importers:
       '@buujs/sati':
         specifier: workspace:*
         version: link:../core
+      '@buujs/sati-croner':
+        specifier: workspace:*
+        version: link:../croner
       '@hono/node-server':
         specifier: ^2.0.0
         version: 2.0.8(hono@4.12.29)

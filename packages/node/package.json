@@ -42,7 +42,8 @@
     "@types/node": "^22.20.1"
   },
   "peerDependencies": {
-    "@buujs/sati": "workspace:*"
+    "@buujs/sati": "workspace:*",
+    "@buujs/sati-croner": "workspace:*"
   },
   "engines": {
     "node": ">=20"

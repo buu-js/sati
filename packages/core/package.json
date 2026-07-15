@@ -26,6 +26,16 @@
         "default": "./dist/index.cjs"
       }
     },
+    "./boot": {
+      "import": {
+        "types": "./dist/boot/index.d.ts",
+        "default": "./dist/boot/index.js"
+      },
+      "require": {
+        "types": "./dist/boot/index.d.cts",
+        "default": "./dist/boot/index.cjs"
+      }
+    },
     "./logger": {
       "import": {
         "types": "./dist/logger/index.d.ts",
