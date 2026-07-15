@@ -1,0 +1,245 @@
+diff --git a/README.md b/README.md
+index 6b738f4..2e954c3 100644
+--- a/README.md
++++ b/README.md
+@@ -1,36 +1,52 @@
+-# WIP (Work In Progress)
+-
+ # 👻 Buu SATI (Seamless Application Typesafe Integration)
+-A modern, lightweight, and type-safe middleware orchestration factory built on top of Hono.
+ 
+-Compose, manage, and configure production-ready Hono applications effortlessly with built-in robust middlewares, strict type safety, and zero-overhead modular ecosystem architecture.
++A modern, lightweight, and type-safe middleware orchestration factory built on top of [Hono](https://hono.dev/).
++
++Compose, manage, and configure production-ready applications effortlessly with built-in robust middlewares, strict type safety, a unified lifecycle, and a zero-overhead modular ecosystem architecture.
++
++---
++
++## 📦 Ecosystem Packages
++
++This repository is managed as a monorepo consisting of the following modules:
++
++* **`@buujs/sati` (Core)**: The core declarative middleware factory, context types, and global error handling strategies.
++* **`@buujs/sati-node`**: Out-of-the-box native Node.js adapter providing production-grade bootstrappers via `@hono/node-server`, runtime signal management, and integrated cron orchestrations.
++* **`@buujs/sati-croner`**: An automated lifecycle-aware background task manager and job scheduler driven by `croner`.
++* **`@buujs/sati-nodemailer`**: A type-safe, environment-aware mail transport middleware wrapper powered by `nodemailer`.
+ 
+ ---
+ 
+-## Features
++## 🔌 Core Features
+ 
+ * 🔌 **Declarative Middleware Factory**: Orchestrate framework-level middlewares (`cors`, `rateLimiter`, `compress`, `secureHeaders`, `ip`, `logger`) using an intuitive functional approach.
+ * 🛡️ **Production-Ready Core Middlewares**: Built-in enterprise-grade middlewares including a regex-based dynamic CORS handler, automated client IP resolution, and environment-aware structured error handling.
+ * 📈 **High-Performance Logging**: Integration with `pino` for lightning-fast structured logging with automated runtime context binding (user, method, path).
+ * 🎛️ **Rate Limiting with Custom Bypasses**: Flexible request throttling powered by `hono-rate-limiter` supporting runtime IP extraction and custom dynamic skip constraints.
++* 🛑 **Auto Graceful Unregistration & Shutdown**: Automated interception of system signals (`SIGINT`, `SIGTERM`) and runtime exceptions to securely terminate servers and clear schedules without active leakage.
+ 
+ ---
+ 
+-## Installation
++## 🚀 Installation
++
++Install the core package along with `hono`:
+ 
+ ```sh
+ pnpm add @buujs/sati hono
++pnpm add @buujs/sati-node @buujs/sati-croner @buujs/sati-nodemailer 
+ ```
+ 
+ ---
+ 
+ ## Usage
+ 
++### 1. Define the Application (Core Middlewares)
++
+ ```ts
+ import { createSati } from "@buujs/sati";
+-import { getConnInfo } from "@hono/node-server/conninfo"; // run on Node.js env
++import { getConnInfo } from "@hono/node-server/conninfo"; // Node.js connection info resolver
+ 
+-const app = createSati({
++export const app = createSati({
+   middlewares: (m) => [
+     // 1. Enable compression
+     m.compress(),
+@@ -38,15 +54,13 @@ const app = createSati({
+     // 2. Inject security headers
+     m.secureHeaders(),
+     
+-    // 3. Resolve and inject client IP address into context
+-    m.ip({
+-      getConnInfo
+-    }),
++    // 3. Resolve and inject client IP address into context variable map
++    m.ip({ getConnInfo }),
+     
+-    // 4. Attach high-performance Pino logger
++    // 4. Attach high-performance Pino logger with contextual binding
+     m.logger(),
+     
+-    // 5. Apply dynamic CORS rules
++    // 5. Apply regex-based dynamic CORS rules
+     m.cors({
+       wildcardDomain: "example.com",
+       fallbackHost: "http://localhost:8081"
+@@ -61,9 +75,61 @@ const app = createSati({
+   ]
+ });
+ 
++// Context-aware type-safe route handler
+ app.get("/ping", (c) => {
+   const logger = c.get("logger");
+   logger.info("Ping route accessed");
+   return c.text("pong");
+ });
++```
++
++### 2. Bootstrapping with Node.js & Cron Schedulers
++
++```ts
++import { boot } from "@buujs/sati-node";
++import { app } from "./app";
++
++boot(app, {
++  name: "MySatiGateway",
++  port: 3000,
++  schedule: {
++    name: "MetricsCollector",
++    cronTime: "*/5 * * * *", // Runs every 5 minutes
++    trigger: true,          // Execute once immediately upon listening
++    fn: async () => {
++      console.log("Compiling background cluster metrics...");
++    }
++  }
++});
++```
++
++### 3. Adding Mail Delivery (@buujs/sati-nodemailer)
++
++```ts
++import { mailer } from "@buujs/sati-nodemailer";
++import { createSMTPMailer } from "@buujs/sati-nodemailer/smtp";
++import { app } from "./app";
++
++const transport = createSMTPMailer({
++  host: "smtp.example.com",
++  port: 587,
++  user: "user@example.com",
++  password: "securepassword",
++  from: "noreply@example.com",
++  principal: "My App Team",
++  isProduction: process.env.NODE_ENV === "production"
++});
++
++// Inject mailer instance globally or into a sub-router scope
++app.use("/api/*", mailer(transport));
++
++app.post("/api/alert", async (c) => {
++  const mailerInstance = c.var.mailer; // Fully typed
++  await mailerInstance.sendMail({
++    to: "admin@example.com",
++    subject: "System Alert",
++    text: "Something happened!"
++  });
++  return c.text("Alert sent.");
++});
+ ```
+\ No newline at end of file
+diff --git a/package.json b/package.json
+index d894a86..270871a 100644
+--- a/package.json
++++ b/package.json
+@@ -7,15 +7,7 @@
+   "repository": "github:buu-js/sati",
+   "type": "module",
+   "scripts": {
+-    "dev": "tsdx dev",
+-    "build": "tsdx build",
+-    "test": "tsdx test",
+-    "test:watch": "tsdx test --watch",
+-    "lint": "tsdx lint",
+-    "format": "tsdx format",
+-    "format:check": "tsdx format --check",
+-    "typecheck": "tsdx typecheck",
+-    "prepublishOnly": "bun run build"
++    "clean:install": "node bin/clean-modules.ts && pnpm install"
+   },
+   "devDependencies": {
+     "@buujs/sati": "workspace:*",
+diff --git a/packages/core/bin/pretty-log.js b/packages/core/bin/pretty-log.js
+old mode 100644
+new mode 100755
+diff --git a/packages/nodemailer/package.json b/packages/nodemailer/package.json
+index baca6de..0674948 100644
+--- a/packages/nodemailer/package.json
++++ b/packages/nodemailer/package.json
+@@ -22,27 +22,36 @@
+         "default": "./dist/index.cjs"
+       }
+     },
++    "./smtp": {
++      "import": {
++        "types": "./dist/smtp/index.d.ts",
++        "default": "./dist/smtp/index.js"
++      },
++      "require": {
++        "types": "./dist/smtp/index.d.cts",
++        "default": "./dist/smtp/index.cjs"
++      }
++    },
+     "./package.json": "./package.json"
+   },
+   "scripts": {
+     "dev": "tsdx dev",
+     "build": "tsdx build",
+-    "test": "tsdx test",
+-    "test:watch": "tsdx test --watch",
++    "test": "vitest run",
++    "test:watch": "vitest",
+     "lint": "tsdx lint",
+     "format": "tsdx format",
+     "format:check": "tsdx format --check",
+     "typecheck": "tsdx typecheck",
+-    "prepublishOnly": "bun run build"
+-  },
+-  "dependencies": {
+-    "nodemailer": "^9.0.3"
++    "prepublishOnly": "pnpm build"
+   },
+   "devDependencies": {
+-    "@types/nodemailer": "^8.0.1"
++    "@buujs/sati-utils": "workspace:*"
+   },
+   "peerDependencies": {
+-    "@buujs/sati": "workspace:*"
++    "@buujs/sati": "workspace:*",
++    "@types/nodemailer": "^8.0.1",
++    "nodemailer": "^9.0.3"
+   },
+   "engines": {
+     "node": ">=20"
+diff --git a/pnpm-lock.yaml b/pnpm-lock.yaml
+index 3d2b1d2..096c138 100644
+--- a/pnpm-lock.yaml
++++ b/pnpm-lock.yaml
+@@ -107,13 +107,16 @@ importers:
+       '@buujs/sati':
+         specifier: workspace:*
+         version: link:../core
++      '@types/nodemailer':
++        specifier: ^8.0.1
++        version: 8.0.1
+       nodemailer:
+         specifier: ^9.0.3
+         version: 9.0.3
+     devDependencies:
+-      '@types/nodemailer':
+-        specifier: ^8.0.1
+-        version: 8.0.1
++      '@buujs/sati-utils':
++        specifier: workspace:*
++        version: link:../utils
+ 
+   packages/utils: {}
+ 

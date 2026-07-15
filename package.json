@@ -7,15 +7,7 @@
   "repository": "github:buu-js/sati",
   "type": "module",
   "scripts": {
-    "dev": "tsdx dev",
-    "build": "tsdx build",
-    "test": "tsdx test",
-    "test:watch": "tsdx test --watch",
-    "lint": "tsdx lint",
-    "format": "tsdx format",
-    "format:check": "tsdx format --check",
-    "typecheck": "tsdx typecheck",
-    "prepublishOnly": "bun run build"
+    "clean:install": "node bin/clean-modules.ts && pnpm install"
   },
   "devDependencies": {
     "@buujs/sati": "workspace:*",

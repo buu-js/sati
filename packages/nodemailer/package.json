@@ -22,27 +22,36 @@
         "default": "./dist/index.cjs"
       }
     },
+    "./smtp": {
+      "import": {
+        "types": "./dist/smtp/index.d.ts",
+        "default": "./dist/smtp/index.js"
+      },
+      "require": {
+        "types": "./dist/smtp/index.d.cts",
+        "default": "./dist/smtp/index.cjs"
+      }
+    },
     "./package.json": "./package.json"
   },
   "scripts": {
     "dev": "tsdx dev",
     "build": "tsdx build",
-    "test": "tsdx test",
-    "test:watch": "tsdx test --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "lint": "tsdx lint",
     "format": "tsdx format",
     "format:check": "tsdx format --check",
     "typecheck": "tsdx typecheck",
-    "prepublishOnly": "bun run build"
-  },
-  "dependencies": {
-    "nodemailer": "^9.0.3"
+    "prepublishOnly": "pnpm build"
   },
   "devDependencies": {
-    "@types/nodemailer": "^8.0.1"
+    "@buujs/sati-utils": "workspace:*"
   },
   "peerDependencies": {
-    "@buujs/sati": "workspace:*"
+    "@buujs/sati": "workspace:*",
+    "@types/nodemailer": "^8.0.1",
+    "nodemailer": "^9.0.3"
   },
   "engines": {
     "node": ">=20"
