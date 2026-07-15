@@ -35,14 +35,12 @@
     "typecheck": "tsdx typecheck",
     "prepublishOnly": "pnpm run build"
   },
-  "dependencies": {
-    "croner": "^10.0.1"
-  },
   "devDependencies": {
     "@buujs/sati-utils": "workspace:*"
   },
   "peerDependencies": {
-    "@buujs/sati": "workspace:*"
+    "@buujs/sati": "workspace:*",
+    "croner": "^10.0.1"
   },
   "engines": {
     "node": ">=20"
