@@ -18,7 +18,7 @@ vi.mock("../src/logger", async () => {
   return { ...actual }
 })
 vi.mock("../src/graceful-shutdown", async () => {
-  const actual = await vi.importActual<typeof import("../src/graceful-shutdown")>(
+  const actual = await vi.importActual<typeof import("../src/shutdown")>(
     "../src/graceful-shutdown"
   )
   return { ...actual }
@@ -37,7 +37,7 @@ describe("Boot Configuration", () => {
 
   it("should initialize createBoot with the correct core dependencies", async () => {
     const { logger } = await import("../src/logger")
-    const { gracefulShutdown } = await import("../src/graceful-shutdown")
+    const { gracefulShutdown } = await import("../src/shutdown")
     const { scheduler } = await import("../src/scheduler")
 
     await import("../src/boot")

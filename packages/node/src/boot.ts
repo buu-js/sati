@@ -1,6 +1,6 @@
 import { createBoot } from "@buujs/sati/boot"
 import { logger } from "./logger"
-import { gracefulShutdown } from "./graceful-shutdown"
+import { gracefulShutdown } from "./shutdown"
 import { scheduler } from "./scheduler"
 import { serve as nodeServe } from "@hono/node-server"
 

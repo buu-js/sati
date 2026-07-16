@@ -1,13 +1,14 @@
 import { describe, it, expect } from "vitest"
 import { PassThrough } from "node:stream"
-import { initPipeline } from "../src/bin/pretty-log"
+import { createPrettyLog } from "../src/pretty-log"
 
 describe("Pino Pretty Output Verification", () => {
   it("should process JSON logs into a readable format based on customConfig", async () => {
     const mockStdin = new PassThrough()
     const mockStdout = new PassThrough()
+    const mockGracefulShutdown = (_: () => void) => {}
 
-    initPipeline(mockStdin as any, mockStdout as any)
+    createPrettyLog(mockGracefulShutdown, mockStdin as any, mockStdout as any)
 
     const readOutput = new Promise((resolve) => {
       let actualOutput = ""

@@ -4,12 +4,8 @@
   "license": "MIT",
   "author": "Forte Zhuo",
   "repository": "github:buu-js/sati",
-  "bin": {
-    "pretty-log": "./bin/pretty-log.js"
-  },
   "files": [
-    "dist",
-    "bin"
+    "dist"
   ],
   "type": "module",
   "main": "./dist/index.cjs",
@@ -62,6 +58,16 @@
       "require": {
         "types": "./dist/shutdown/index.d.cts",
         "default": "./dist/shutdown/index.cjs"
+      }
+    },
+    "./pretty-log": {
+      "import": {
+        "types": "./dist/pretty-log/index.d.ts",
+        "default": "./dist/pretty-log/index.js"
+      },
+      "require": {
+        "types": "./dist/pretty-log/index.d.cts",
+        "default": "./dist/pretty-log/index.cjs"
       }
     },
     "./package.json": "./package.json"

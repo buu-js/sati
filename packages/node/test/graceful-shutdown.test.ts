@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest"
 import process from "node:process"
-import { nodeRuntime } from "../src/graceful-shutdown"
+import { nodeRuntime } from "../src/shutdown"
 
 vi.spyOn(process, "on")
 vi.spyOn(process, "exit").mockImplementation(
