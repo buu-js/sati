@@ -1,3 +1,5 @@
+import { createLogger } from "./logger"
+
 export interface RuntimeAdapter {
   onShutdown: (handler: (signal: string, error?: Error) => void) => void
   exit: (code: number) => never
@@ -5,9 +7,20 @@ export interface RuntimeAdapter {
 
 export type GracefulShutdown = (fnCleanUp: () => void | Promise<void>) => void
 
-export type GracefulShutdownFactory = (runtime: RuntimeAdapter) => GracefulShutdown
+export type GracefulShutdownFactory = (
+  runtime: RuntimeAdapter,
+  logger?: ReturnType<typeof createLogger>
+) => GracefulShutdown
 
-export const createGracefulShutdown: GracefulShutdownFactory = (runtime) => {
+export const createGracefulShutdown: GracefulShutdownFactory = (runtime, logger) => {
+  const consoleLogger = {
+    info: (message: string) => (logger ? logger.info(message) : console.log(message)),
+    error: (message: string, error?: unknown) =>
+      logger
+        ? logger.error(message, error)
+        : console.error(message, ...(error !== undefined ? [error] : []))
+  }
+
   const gracefulShutdown = function (fnCleanUp: () => void | Promise<void>) {
     let isCleanedUp = false
 
@@ -16,9 +29,9 @@ export const createGracefulShutdown: GracefulShutdownFactory = (runtime) => {
 
       isCleanedUp = true
       if (error) {
-        console.error(`[Crash] ${signal}:`, error)
+        consoleLogger.error(`[Crash] ${signal}:`, error)
       } else {
-        console.log(`[Shutdown] Received ${signal}`)
+        consoleLogger.info(`[Shutdown] Received ${signal}`)
       }
 
       try {

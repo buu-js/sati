@@ -13,11 +13,9 @@ describe("Odoo Client", () => {
     vi.restoreAllMocks()
     fetchMock.mockReset()
 
-    // 1. Suntik mock fetch ke global scope terlebih dahulu
     vi.stubGlobal("fetch", fetchMock)
 
-    // 2. Gunakan dynamic import agar modul membaca global fetch yang sudah di-mock
-    const module = await import("../src/client") // Sesuaikan path ke file client Anda
+    const module = await import("../src/client")
     createOdooClient = module.createOdooClient
   })
 

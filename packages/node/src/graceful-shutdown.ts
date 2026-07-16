@@ -1,5 +1,6 @@
 import process from "node:process"
 import { createGracefulShutdown, RuntimeAdapter } from "@buujs/sati/shutdown"
+import { logger } from "./logger"
 
 const signals: NodeJS.Signals[] = ["SIGINT", "SIGTERM"]
 
@@ -23,4 +24,4 @@ export const nodeRuntime: RuntimeAdapter = {
   exit: (code) => process.exit(code)
 }
 
-export const gracefulShutdown = createGracefulShutdown(nodeRuntime)
+export const gracefulShutdown = createGracefulShutdown(nodeRuntime, logger)

@@ -2,6 +2,8 @@
 import process from 'node:process';
 import pinoPretty from 'pino-pretty';
 
+const isMain = process.argv[1] === import.meta.filename;
+const hasPipeInput = !process.stdin.isTTY;
 const customConfig = {
     colorize: true,
     translateTime: "SYS:yyyy-mm-dd HH:MM:ss",
@@ -19,7 +21,7 @@ function initPipeline(input = process.stdin, output = process.stdout) {
     });
     input.pipe(prettyStream);
 }
-if (process.argv[1] === import.meta.filename) {
+if (isMain || hasPipeInput) {
     initPipeline();
 }
 
