@@ -21,7 +21,11 @@ export const nodeRuntime: RuntimeAdapter = {
       handler("unhandledRejection", error)
     })
   },
-  exit: (code) => process.exit(code)
+  exit: (code) => {
+    setTimeout(() => {
+      process.exit(code)
+    }, 100)
+  }
 }
 
 export const gracefulShutdown = createGracefulShutdown(nodeRuntime, logger)

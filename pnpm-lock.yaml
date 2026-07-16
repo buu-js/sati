@@ -59,6 +59,9 @@ importers:
 
   packages/core:
     dependencies:
+      '@buujs/sati':
+        specifier: 'link:'
+        version: 'link:'
       hono:
         specifier: ^4.12.27
         version: 4.12.29

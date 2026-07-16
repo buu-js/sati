@@ -92,12 +92,21 @@ describe("nodeRuntime Adapter", () => {
   })
 
   describe("exit", () => {
+    beforeEach(() => {
+      vi.useFakeTimers()
+    })
+
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
     it("should call process.exit with the provided exit code", () => {
       try {
         nodeRuntime.exit(1)
       } catch (_) {
         // Ignore
       }
+      vi.advanceTimersByTime(100)
       expect(process.exit).toHaveBeenCalledWith(1)
     })
   })

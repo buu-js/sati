@@ -2,7 +2,7 @@ import { createLogger } from "./logger"
 
 export interface RuntimeAdapter {
   onShutdown: (handler: (signal: string, error?: Error) => void) => void
-  exit: (code: number) => never
+  exit: (code: number) => void
 }
 
 export type GracefulShutdown = (fnCleanUp: () => void | Promise<void>) => void
