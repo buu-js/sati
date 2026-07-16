@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer"
 import type SMTPTransport from "nodemailer/lib/smtp-transport"
-import { MailerAdapter, type BaseMailerConfig } from "./type"
+import { MailerAdapter, type BaseMailerConfig } from "./types"
 
 export type SMTPMailerConfig = {
   host: string

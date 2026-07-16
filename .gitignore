@@ -1,4 +1,6 @@
 # Dependencies
+changes.patch
+repomix*.*
 node_modules
 .pnp
 .pnp.js

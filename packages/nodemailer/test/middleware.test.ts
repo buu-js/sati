@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from "vitest"
 import { Hono } from "hono"
 import { mailer } from "../src"
-import type { MailerTransporter } from "../src/type"
+import type { MailerTransporter } from "../src/types"
 
 describe("Mailer Middleware", () => {
   // 1. Create a minimal mock of MailerTransporter

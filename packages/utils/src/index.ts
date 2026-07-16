@@ -1,8 +1,7 @@
-import { type HTTPException } from "hono/http-exception"
-
-type AssertError = string | Error | HTTPException
-
-export function assert(condition: unknown, error: AssertError): asserts condition {
+export function assert<AssertError extends Error>(
+  condition: unknown,
+  error: AssertError | string
+): asserts condition {
   if (condition) {
     return
   }
