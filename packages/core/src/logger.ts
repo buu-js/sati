@@ -27,12 +27,12 @@ function resolveContext(context?: Context) {
 function getPrefix(c?: Context): string {
   if (!c) return "System - "
   const binding = resolveContext(c)
-  return `${binding.user} ${binding.method} - ${binding.path} - `
+  return `[${binding.method} ${binding.path} - ${binding.user}] : `
 }
 
 export function createLogger(ctx?: Context): Logger {
   const prefix = getPrefix(ctx)
-  const logger = baseLogger.child(resolveContext(ctx))
+  const logger = baseLogger
 
   function error(arg1: unknown, arg2?: unknown): void {
     const isErr = arg1 instanceof Error

@@ -63,11 +63,11 @@ importers:
         specifier: 'link:'
         version: 'link:'
       hono:
-        specifier: ^4.12.27
-        version: 4.12.29
+        specifier: ^4.0.0
+        version: 4.12.30
       hono-rate-limiter:
         specifier: ^0.5.3
-        version: 0.5.3(hono@4.12.29)
+        version: 0.5.3(hono@4.12.30)
       pino:
         specifier: ^10.3.1
         version: 10.3.1
@@ -1238,10 +1238,6 @@ packages:
     peerDependenciesMeta:
       unstorage:
         optional: true
-
-  hono@4.12.29:
-    resolution: {integrity: sha512-1hNiRjawYrLq/4m3DQQjPGFg0VZkk4RjQJDff/excI6Dm9BiL75qxGrd7/c6YOxPdq6AscP3LiXhQ6fKFC1Waw==}
-    engines: {node: '>=16.9.0'}
 
   hono@4.12.30:
     resolution: {integrity: sha512-emn+JoJjrN9YTpRDS5it/UI2SO9BAE37T6I3d963RxcZ81G9A4pr2SZTEiiaiKbzx+NKRg5BZ89fCL7gCJCUog==}
@@ -2555,11 +2551,9 @@ snapshots:
 
   help-me@5.0.0: {}
 
-  hono-rate-limiter@0.5.3(hono@4.12.29):
+  hono-rate-limiter@0.5.3(hono@4.12.30):
     dependencies:
-      hono: 4.12.29
-
-  hono@4.12.29: {}
+      hono: 4.12.30
 
   hono@4.12.30: {}
 

@@ -4,6 +4,12 @@ import { createOdooClient } from "./client"
 import { OdooConfig } from "./types"
 import { OdooError } from "./errors"
 import { HTTPException } from "hono/http-exception"
+import { Context } from "hono"
+
+export type OdooRefreshAuth = (
+  c: Context,
+  client: ReturnType<typeof createOdooClient>
+) => Promise<void> | void
 
 declare module "hono" {
   interface ContextVariableMap {
@@ -11,9 +17,10 @@ declare module "hono" {
   }
 }
 
-export const odoo = (config: OdooConfig) =>
+export const odoo = (config: OdooConfig, onRefreshAuth: OdooRefreshAuth) =>
   createMiddleware(async (c, next) => {
     const client = createOdooClient(config)
+    if (onRefreshAuth) await onRefreshAuth(c, client)
     c.set("odoo", client)
 
     try {

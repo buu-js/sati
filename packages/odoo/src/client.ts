@@ -1,4 +1,6 @@
 import {
+  AppAccess,
+  GroupDetail,
   OdooConfig,
   OdooFetchOptions,
   OdooLogin,
@@ -40,10 +42,10 @@ export const createOdooClient = (config: OdooConfig) => {
     return { result: data.result, cookie: setCookie }
   }
 
-  async function login({ username, password, db }: Omit<OdooLogin, "type">) {
+  async function login({ login, password, db }: Omit<OdooLogin, "type">) {
     const { result, cookie } = (await odooFetch(`${host}/web/session/authenticate`, {
       params: {
-        username,
+        login,
         password,
         db
       },
@@ -58,7 +60,68 @@ export const createOdooClient = (config: OdooConfig) => {
     }
   }
 
-  function refreshAuth<Session extends OdooSession>(_auth: Omit<Session, "type">) {
+  async function accessControl(): Promise<AppAccess[]> {
+    assert(
+      auth?.type === "session" && !!auth.uid,
+      new OdooError({ code: 401, message: "Odoo unauthenticated" })
+    )
+
+    const userResult: any = await exec({
+      params: {
+        model: "res.users",
+        method: "read",
+        args: [[auth?.uid], ["groups_id"]]
+      }
+    })
+
+    const groupIds: number[] = userResult[0].groups_id
+    const groups: any = await exec({
+      params: {
+        model: "res.groups",
+        method: "search_read",
+        kwargs: {
+          domain: [["id", "in", groupIds]],
+          fields: ["name", "category_id", "implied_ids"]
+        }
+      }
+    })
+
+    return computeAccessControl(groups)
+
+    function computeAccessControl(groups: GroupDetail[]): AppAccess[] {
+      const byCategory: Record<number, GroupDetail[]> = {}
+
+      for (const g of groups) {
+        if (!g.category_id) continue // grup teknis tanpa app, skip
+        const catId = g.category_id[0]
+        ;(byCategory[catId] ??= []).push(g)
+      }
+
+      const result: AppAccess[] = []
+
+      for (const [catIdStr, groupsInCat] of Object.entries(byCategory)) {
+        const catId = Number(catIdStr)
+
+        const impliedSet = new Set<number>()
+        for (const g of groupsInCat) {
+          g.implied_ids.forEach((id) => impliedSet.add(id))
+        }
+
+        const topGroups = groupsInCat.filter((g) => !impliedSet.has(g.id))
+
+        result.push({
+          appId: catId,
+          appName: (groupsInCat[0].category_id as [number, string])[1],
+          level: topGroups.map((g) => g.name).join(" / "),
+          allLevels: groupsInCat.map((g) => g.name)
+        })
+      }
+
+      return result
+    }
+  }
+
+  function setAuth<Session extends OdooSession>(_auth: Omit<Session, "type">) {
     auth = { type: "session", ..._auth }
   }
 
@@ -169,7 +232,11 @@ export const createOdooClient = (config: OdooConfig) => {
 
   return {
     login,
-    refreshAuth,
+    accessControl,
+    get auth() {
+      return auth
+    },
+    setAuth,
     model: (name: string) => {
       const model = {} as any
       Object.entries(methods).forEach(([key, fn]) => {

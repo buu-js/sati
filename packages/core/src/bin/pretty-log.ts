@@ -5,6 +5,7 @@ import process from "node:process"
 const defaultArgs = [
   "--colorize",
   "--translateTime",
+  "SYS:yyyy-mm-dd HH:MM:ss",
   "--ignore",
   "hostname",
   "--singleLine",
@@ -31,4 +32,4 @@ if (!process.stdin.isTTY) {
 }
 
 //@ts-ignore
-import("pino-pretty/bin")
+import("pino-pretty/bin.js")

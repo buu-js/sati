@@ -8,7 +8,7 @@ export type OdooSession = {
 
 export type OdooLogin = {
   type: "login"
-  username: string
+  login: string
   password: string
   db: string
 }
@@ -16,6 +16,20 @@ export type OdooLogin = {
 export interface OdooConfig {
   host: string
   dispatcher?: unknown
+}
+
+export type GroupDetail = {
+  id: number
+  name: string
+  category_id: [number, string] | false
+  implied_ids: number[]
+}
+
+export type AppAccess = {
+  appId: number
+  appName: string
+  level: string
+  allLevels: string[]
 }
 
 export type OdooFetchOptions = {
